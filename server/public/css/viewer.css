@@ -4,6 +4,15 @@ body {
     align-items: center;
 }
 
+.rfid {
+    font-family: sans-serif;
+    font-size: 14px;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    line-height: 18px;;
+}
+
 .rfidContainer {
     display: grid;
     grid-template-columns: 1fr;

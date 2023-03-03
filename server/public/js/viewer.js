@@ -8,10 +8,17 @@ socket.on("connect", () => {
 });
 
 socket.on("rfid-list", (data) => {
-  const children = data.map((d) => {
+  const children = data.reverse().map((d) => {
     const listItem = document.createElement("div");
     listItem.classList = ["rfid"];
-    listItem.innerHTML = `<div>RFID: ${d.rfid}</div><div>id: ${d.id}</div>`;
+    listItem.style = `background-color: ${
+      d.status === "GOOD" ? "green" : "red"
+    }`;
+    listItem.innerHTML = `
+      <div>RFID: ${d.rfid}</div>
+      <div>id: ${d.id}</div>
+      <div>status: ${d.status}</div>
+    `;
     return listItem;
   });
   container.replaceChildren(...children);

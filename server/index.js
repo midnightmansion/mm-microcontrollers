@@ -13,13 +13,20 @@ app.use(bodyParser.json());
 
 const MAX_MEMORY = 10;
 const IN_MEMORY_DATABASE = [];
+const BAD_RFIDS = ["84DBBD5A"];
 
 // Function to handle the root path
 app.get("/", async function (req, res) {
   // Access the provided 'page' and 'limt' query parameters
   const params = req.query;
   if (Object.hasOwn(params, "id") && Object.hasOwn(params, "rfid")) {
-    res.send("GOOD*");
+    if (BAD_RFIDS.includes(params.rfid)) {
+      res.send("BAD*");
+      params.status = "BAD";
+    } else {
+      res.send("GOOD*");
+      params.status = "GOOD";
+    }
     if (IN_MEMORY_DATABASE.length >= MAX_MEMORY) {
       IN_MEMORY_DATABASE.shift();
     }
