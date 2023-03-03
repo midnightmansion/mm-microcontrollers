@@ -1,0 +1,11 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rfidContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
