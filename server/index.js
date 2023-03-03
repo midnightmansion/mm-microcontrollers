@@ -19,3 +19,5 @@ app.get("/", async function (req, res) {
 let server = app.listen(3030, function () {
   console.log("Server is listening on port 3030");
 });
+
+module.exports = app;

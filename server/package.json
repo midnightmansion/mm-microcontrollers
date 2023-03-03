@@ -4,6 +4,6 @@
     "nodemon": "^2.0.21"
   },
   "scripts": {
-    "start": "nodemon test-server.js"
+    "start": "nodemon index.js"
   }
 }
