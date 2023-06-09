@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 const MAX_MEMORY = 10;
 const IN_MEMORY_DATABASE = [];
-const BAD_RFIDS = ["84DBBD5A"];
+const BAD_RFIDS = ["HELPME", "84DBBD5A"];
 
 // Function to handle the root path
 app.get("/", async function (req, res) {
@@ -24,6 +24,7 @@ app.get("/", async function (req, res) {
       res.send("BAD*");
       params.status = "BAD";
     } else {
+      await new Promise((r) => setTimeout(r, 500));
       res.send("GOOD*");
       params.status = "GOOD";
     }
