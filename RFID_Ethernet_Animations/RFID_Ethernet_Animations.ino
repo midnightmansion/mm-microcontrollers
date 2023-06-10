@@ -13,7 +13,7 @@ Adafruit_NeoPixel pixels(NUM_PIXELS, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 unsigned long lastAnimation;
 #define ATTRACT_ANIMATION 0
-#define ATTRACT_DURATION 1000000  // Microseconds
+#define ATTRACT_DURATION 500000  // Microseconds
 #define MIN_ATTRACT_BRIGHTNESS 10
 #define MAX_ATTRACT_BRIGHTNESS 200
 int attract_brightness;
@@ -43,11 +43,8 @@ IPAddress myDns(192, 168, 0, 1);
 EthernetClient client;
 
 // RFID -------------------------------------------------------------------------------------------
-#define SCK 14
-#define MOSI 15
-#define MISO 8
 #define PN532_SS 12
-Adafruit_PN532 nfc(SCK, MISO, MOSI, PN532_SS);
+Adafruit_PN532 nfc(PN532_SS);
 
 #define RFID_DEBOUNCE_DURATION 1000000
 unsigned long lastRfidRead;
@@ -129,7 +126,6 @@ void playAnimation() {
 void processClientData() {
   int len = client.available();
   if (len <= 0) {
-    Serial.println("No client data");
     return;
   }
   Serial.println("Processing Client Data");
@@ -155,6 +151,7 @@ void makeServerRequest(String tag) {
 
     Serial.print("Sent request for ");
     Serial.println(tag);
+
     processingCount += 1;
     animation = PROCESSING_ANIMATION;
   } else {
@@ -170,13 +167,13 @@ void processRFIDData() {
   if (delta < RFID_DEBOUNCE_DURATION) {
     return;
   }
+
   boolean success;
   uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
   uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
   success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength, 100);
 
   if (!success) {
-    Serial.println("Timed out waiting for a card");
     return;
   }
 
@@ -209,7 +206,7 @@ void setup() {
   while (!Serial) {
     delay(10);  // wait for serial port to connect. Needed for native USB port only
   }
-
+  // digitalWrite(10, HIGH);
   // RFID Setup
   nfc.begin();
 
@@ -254,8 +251,6 @@ void setup() {
 
   // give the Ethernet a second to initialize:
   delay(1000);
-
-
 
   // Animation Setup
   lastAnimation = micros();

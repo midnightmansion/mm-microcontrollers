@@ -13,18 +13,21 @@ app.use(bodyParser.json());
 
 const MAX_MEMORY = 10;
 const IN_MEMORY_DATABASE = [];
-const BAD_RFIDS = ["HELPME", "84DBBD5A"];
+const BAD_RFIDS = ["B2385FA9"];
+const SLOW_RFIDS = ["62E6A389"];
 
 // Function to handle the root path
 app.get("/", async function (req, res) {
   // Access the provided 'page' and 'limt' query parameters
   const params = req.query;
   if (Object.hasOwn(params, "id") && Object.hasOwn(params, "rfid")) {
+    if (SLOW_RFIDS.includes(params.rfid)) {
+      await new Promise((r) => setTimeout(r, 500));
+    }
     if (BAD_RFIDS.includes(params.rfid)) {
       res.send("BAD*");
       params.status = "BAD";
     } else {
-      await new Promise((r) => setTimeout(r, 500));
       res.send("GOOD*");
       params.status = "GOOD";
     }
@@ -38,7 +41,7 @@ app.get("/", async function (req, res) {
   }
 });
 
-// Serve the static files from the React app
+// Serve the static files from the React app 
 app.use(express.static(path.join(__dirname, "./public")));
 
 function onError(error) {
