@@ -1,0 +1,14 @@
+{
+  "name": "serial-to-network",
+  "version": "1.0.0",
+  "description": "Forward serial port requests to the network",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "serialport": "^11.0.0"
+  }
+}
