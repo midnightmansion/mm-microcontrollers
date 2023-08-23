@@ -5,7 +5,7 @@ Ouputs 1(no obstruction) or 0(obstruction) in front of sensor
 Kevin Xu
 */
 
-const int breakbeamSensor = 7;
+const int breakbeamSensor = 2;
 
 void setup() {
   Serial.begin(9600);
