@@ -20,13 +20,15 @@ Date: August 23, 2023
 #define LED_PIN_L 4  // Pin for 'L'
 #define LED_PIN_D 5  // Pin for 'D'
 
-#define NUM_LEDS_W 30  // Number of LEDs for 'W'
-#define NUM_LEDS_I 10  // Number of LEDs for 'I'
-#define NUM_LEDS_L 10  // Number of LEDs for 'L'
-#define NUM_LEDS_D 10  // Number of LEDs for 'D'
+#define NUM_LEDS_W 150  // Number of LEDs for 'W'
+#define NUM_LEDS_I 100  // Number of LEDs for 'I'
+#define NUM_LEDS_L 100  // Number of LEDs for 'L'
+#define NUM_LEDS_D 100  // Number of LEDs for 'D'
 
 #define NUM_LED_COMETS 6            // Number of LED strips being used
 #define NUM_STRIPS_SHARED_COMETS 2  // Number of LED strips being used
+
+#define LED_STRIP_TYPE WS2811     // Type of LED Strip used (NEOPIXEL is common)
 
 CRGBArray<NUM_LEDS_W> leds_W;
 CRGBArray<NUM_LEDS_I> leds_I;
@@ -49,18 +51,18 @@ const CHSV Pink = CHSV(224, 255, 255);
 const uint8_t cometSpeed = 0;                       // Adjust the speed (higher = slower) (try 0-10)
 const uint8_t cometLength = 3;                      // Adjust the length of comet
 unsigned long previousMillis = 0;                   // Stores last time LEDs were updated
-int cometPositions[NUM_LED_COMETS - 1] = {};        // One position for each strip
-int cometStart[NUM_STRIPS_SHARED_COMETS - 1] = {};  // Signal for when multi-comets on one strip to start
+int cometPositions[NUM_LED_COMETS] = {};            // One position for each strip
+int cometStart[NUM_STRIPS_SHARED_COMETS] = {};      // Signal for when multi-comets on one strip to start
 
 void setup() {
   // Delay to power up LEDs
   delay(1000);
 
   // Setup LEDs
-  FastLED.addLeds<NEOPIXEL, LED_PIN_W>(leds_W, NUM_LEDS_W).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<NEOPIXEL, LED_PIN_I>(leds_I, NUM_LEDS_I).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<NEOPIXEL, LED_PIN_L>(leds_L, NUM_LEDS_L).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<NEOPIXEL, LED_PIN_D>(leds_D, NUM_LEDS_D).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_W>(leds_W, NUM_LEDS_W).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_I>(leds_I, NUM_LEDS_I).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_L>(leds_L, NUM_LEDS_L).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_D>(leds_D, NUM_LEDS_D).setCorrection(TypicalLEDStrip);
 
   // Clear all LEDs
   FastLED.clear();
@@ -72,7 +74,7 @@ void setup() {
 void loop() {
   // ******************************************************** STRIP 1 ********************************************************
   comet(leds_W, NUM_LEDS_W, Purple, Black, cometSpeed, cometLength, 0);
-  // divide by number of comets on one strip
+  // When first comet reaches halfway start next comet (divide by number of comets on one strip)
   if (cometPositions[0] >= floor(NUM_LEDS_W / 2)) {
     cometStart[0] = 1;
   }
@@ -88,7 +90,7 @@ void loop() {
 
   // ******************************************************** STRIP 4 ********************************************************
   comet(leds_D, NUM_LEDS_D, Red, Black, cometSpeed, cometLength, 4);
-  // divide by number of comets on one strip
+  // When first comet reaches halfway start next comet (divide by number of comets on one strip)
   if (cometPositions[4] >= floor(NUM_LEDS_D / 2)) {
     cometStart[1] = 1;
   }
@@ -99,7 +101,7 @@ void loop() {
   FastLED.show();
 }
 
-// Takes an LED array, number of LEDs in said array, start color, end color, speed, and comet length
+// Takes an LED array, number of LEDs in said array, start color, end color, speed, and comet length, and comet identifier number
 void comet(CRGB* ledStrip, uint8_t numLeds, CHSV startColor, CHSV endColor, int speed, int tailLength, int cometNum) {
   int& cometPosition = cometPositions[cometNum];
 
@@ -123,6 +125,6 @@ void comet(CRGB* ledStrip, uint8_t numLeds, CHSV startColor, CHSV endColor, int 
     ledStrip[ii] = blend(ledStrip[ii], endColor, 10);  // Blend with the background color
   }
 
-  FastLED.show();
+  //FastLED.show();
   delay(speed);  // Adjust the delay for the desired comet speed
 }
