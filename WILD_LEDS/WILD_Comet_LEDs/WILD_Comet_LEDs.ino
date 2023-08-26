@@ -20,7 +20,7 @@ Date: August 23, 2023
 #define LED_PIN_L 4  // Pin for 'L'
 #define LED_PIN_D 5  // Pin for 'D'
 
-#define NUM_LEDS_W 150  // Number of LEDs for 'W'
+#define NUM_LEDS_W 100  // Number of LEDs for 'W'
 #define NUM_LEDS_I 100  // Number of LEDs for 'I'
 #define NUM_LEDS_L 100  // Number of LEDs for 'L'
 #define NUM_LEDS_D 100  // Number of LEDs for 'D'
@@ -79,23 +79,23 @@ void loop() {
     cometStart[0] = 1;
   }
   if (cometStart[0]) {
-    comet(leds_W, NUM_LEDS_W, Pink, Black, cometSpeed, cometLength, 1);
+    comet(leds_W, NUM_LEDS_W, Pink, Black , cometSpeed, cometLength, 1);
   }
   
   // ******************************************************** STRIP 2 ********************************************************
-  comet(leds_I, NUM_LEDS_I, Yellow, Black, cometSpeed, cometLength, 2);
+  comet(leds_I, NUM_LEDS_I, Yellow, White, cometSpeed, cometLength, 2);
   
-  // ******************************************************** STRIP 3 ********************************************************
-  comet(leds_L, NUM_LEDS_L, Blue, Black, cometSpeed, cometLength, 3);
+  // ******************************************************** STRIP 3 ******************************************************** 
+  comet(leds_L, NUM_LEDS_L, Blue, White, cometSpeed, cometLength, 3);
 
   // ******************************************************** STRIP 4 ********************************************************
-  comet(leds_D, NUM_LEDS_D, Red, Black, cometSpeed, cometLength, 4);
+  comet(leds_D, NUM_LEDS_D, Red, White, cometSpeed, cometLength, 4);
   // When first comet reaches halfway start next comet (divide by number of comets on one strip)
   if (cometPositions[4] >= floor(NUM_LEDS_D / 2)) {
     cometStart[1] = 1;
   }
   if (cometStart[1]) {
-    comet(leds_D, NUM_LEDS_D, Orange, Black, cometSpeed, cometLength, 5);
+    comet(leds_D, NUM_LEDS_D, Orange, White, cometSpeed, cometLength, 5);
   }
 
   FastLED.show();
