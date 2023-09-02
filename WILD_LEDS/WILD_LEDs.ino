@@ -24,25 +24,26 @@ Date: August 25, 2023
 #define LED_PIN_D_OUT 6  // Pin for Outer 'D'
 #define LED_PIN_D_IN 7   // Pin for Inner 'D'
 
-#define NUM_LEDS_W1 100                             // Number of LEDs for 'W1'
+#define NUM_LEDS_W1 50                              // Number of LEDs for 'W1'
 #define NUM_LEDS_W2 48                              // Number of LEDs for 'W2'
 #define NUM_LEDS_W_TOTAL NUM_LEDS_W1 + NUM_LEDS_W2  // Number of LEDs for 'W' Total
 #define NUM_LEDS_I 52                               // Number of LEDs for 'I'
 #define NUM_LEDS_L 100                              // Number of LEDs for 'L'
-#define NUM_LEDS_D_OUT 100                          // Number of LEDs for Outer 'D'
-#define NUM_LEDS_D_IN 100                           // Number of LEDs for Inner 'D'
+#define NUM_LEDS_D1 100                             // Number of LEDs for Outer 'D'
+#define NUM_LEDS_D2 35                              // Number of LEDs for Inner 'D'
 
-#define NUM_LED_COMETS 10           // Number of LED comets being used
-#define NUM_STRIPS_SHARED_COMETS 5  // Number of LED strips being used
+#define NUM_LED_COMETS 11           // Number of LED comets being used
+#define NUM_STRIPS_SHARED_COMETS 6  // Number of LED strips being used
 
-#define LED_STRIP_TYPE WS2811  // Type of LED Strip used (NEOPIXEL is common)
+//#define LED_STRIP_TYPE WS2811  // Type of LED Strip used (NEOPIXEL is common)
+#define LED_STRIP_TYPE NEOPIXEL
 
 CRGBArray<NUM_LEDS_W1> leds_W1;
 CRGBArray<NUM_LEDS_W2> leds_W2;
 CRGBArray<NUM_LEDS_I> leds_I;
 CRGBArray<NUM_LEDS_L> leds_L;
-CRGBArray<NUM_LEDS_D_OUT> leds_D_OUT;
-CRGBArray<NUM_LEDS_D_IN> leds_D_IN;
+CRGBArray<NUM_LEDS_D1> leds_D1;
+CRGBArray<NUM_LEDS_D2> leds_D2;
 
 // Define some common colors
 const CHSV Black = CHSV(0, 0, 0);
@@ -57,10 +58,10 @@ const CHSV Purple = CHSV(192, 255, 255);
 const CHSV Pink = CHSV(224, 255, 255);
 
 // Define comet parameters
-const uint8_t cometSpeed = 0;                   // Adjust the speed (higher = slower) (try 0-10)
-const uint8_t cometLength = 3;                  // Adjust the length of comet
-int cometPositions[NUM_LED_COMETS] = {};        // One position for each strip
-int cometStart[NUM_STRIPS_SHARED_COMETS] = {};  // Signal for when multi-comets on one strip to start
+const uint8_t cometSpeed = 0;                    // Adjust the speed (higher = slower) (try 0-10)
+const uint8_t cometLength = 3;                   // Adjust the length of comet
+int cometPositions[NUM_LED_COMETS] = {};         // One position for each strip
+bool cometStart[NUM_STRIPS_SHARED_COMETS] = {};  // Signal for when multi-comets on one strip to start
 
 // Define pulse parameters
 const uint8_t pulseSpeed = 50;     // Adjust the speed (lower value results in faster pulse)
@@ -82,8 +83,14 @@ void setup() {
   FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_W2>(leds_W2, NUM_LEDS_W2).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_I>(leds_I, NUM_LEDS_I).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_L>(leds_L, NUM_LEDS_L).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_D_OUT>(leds_D_OUT, NUM_LEDS_D_OUT).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_D_IN>(leds_D_IN, NUM_LEDS_D_IN).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_D_OUT>(leds_D1, NUM_LEDS_D1).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_STRIP_TYPE, LED_PIN_D_IN>(leds_D2, NUM_LEDS_D2).setCorrection(TypicalLEDStrip);
+
+  cometPositions[1] = NUM_LEDS_W_TOTAL / 2;
+  //cometPositions[2] = NUM_LEDS_W_TOTAL / 3;
+  cometPositions[3] = NUM_LEDS_W2 / 2;
+  cometPositions[7] = NUM_LEDS_D1 / 2;
+  cometPositions[9] = NUM_LEDS_D2 / 2;
 
   // Clear all LEDs
   FastLED.clear();
@@ -93,56 +100,43 @@ void setup() {
 }
 
 void loop() {
-
   // ***************************************************************************************************************************************** COMET
   // ******************************************************** STRIP 1 ********************************************************
-  // W has two LED strips
-  comet(leds_W1, NUM_LEDS_W_TOTAL, Purple, Black, cometSpeed, cometLength, 0);
-  // When first comet reaches halfway start next comet 
-  if (cometPositions[0] >= floor(NUM_LEDS_W1 / 2)) {
-    cometStart[0] = 1;
-  }
-  if (cometStart[0]) {
-    comet(leds_W1, NUM_LEDS_W_TOTAL, Pink, Black, cometSpeed, cometLength, 1);
-  }
-  // When first comet reaches second strip, continue with no inturptions
-  if (cometPositions[0] >= NUM_LEDS_W1) {
-    cometPositions[2] = cometPositions[0] - NUM_LEDS_W1; // Changes place to continue on 2nd strip
-    comet(leds_W2, NUM_LEDS_W_TOTAL, Purple, Black, cometSpeed, cometLength, 2); 
-    if (cometPositions[2] >= floor(NUM_LEDS_W2 / 2)) {
-      cometStart[1] = 1;
-    }
-    if (cometStart[1]) {
-      cometPositions[3] = cometPositions[0] - NUM_LEDS_W1 - floor(NUM_LEDS_W2 / 2); // start halfway after 1st comet goes on 2nd strip
-      comet(leds_W2, NUM_LEDS_W_TOTAL, Pink, Black, cometSpeed, cometLength, 3);
-    }
-  }
+  comet(leds_W1, NUM_LEDS_W1, Purple, Black, cometSpeed, cometLength, 0, NUM_LEDS_W_TOTAL);
+  comet(leds_W1, NUM_LEDS_W1, Pink, Black, cometSpeed, cometLength, 1, NUM_LEDS_W_TOTAL);
 
   // ******************************************************** STRIP 2 ********************************************************
-  comet(leds_I, NUM_LEDS_I, Yellow, Black, cometSpeed, cometLength, 4);
+  //comet(leds_W2, NUM_LEDS_W1, Purple, Black, cometSpeed, cometLength, 2, NUM_LEDS_W_TOTAL);
+  if (cometPositions[0] > NUM_LEDS_W1) {
+    comet(leds_W2, NUM_LEDS_W2, Purple, Black, cometSpeed, cometLength, 2, NUM_LEDS_W2);
+  }
+  else {
+    fadeToBlackBy(leds_W2, NUM_LEDS_W2, 10);
+  }
+  if (cometPositions[1] > NUM_LEDS_W1) {
+    comet(leds_W2, NUM_LEDS_W2, Yellow, Black, cometSpeed, cometLength, 3, NUM_LEDS_W2);
+  }
+  else {
+    fadeToBlackBy(leds_W2, NUM_LEDS_W2, 10);
+  }
 
   // ******************************************************** STRIP 3 ********************************************************
-  comet(leds_L, NUM_LEDS_L, Blue, Black, cometSpeed, cometLength, 5);
+  comet(leds_I, NUM_LEDS_I, Yellow, Black, cometSpeed, cometLength, 4, NUM_LEDS_I);
 
   // ******************************************************** STRIP 4 ********************************************************
-  comet(leds_D_OUT, NUM_LEDS_D_OUT, Red, Black, cometSpeed, cometLength, 6);
-  // When first comet reaches halfway start next comet (divide by number of comets on one strip)
-  if (cometPositions[4] >= floor(NUM_LEDS_D_OUT / 2)) {
-    cometStart[1] = 1;
-  }
-  if (cometStart[1]) {
-    comet(leds_D_OUT, NUM_LEDS_D_OUT, Orange, Black, cometSpeed, cometLength, 7);
-  }
-  // ******************************************************** STRIP 5 ********************************************************
-  comet(leds_D_IN, NUM_LEDS_D_IN, Red, Black, cometSpeed, cometLength, 8);
-  // When first comet reaches halfway start next comet (divide by number of comets on one strip)
-  if (cometPositions[4] >= floor(NUM_LEDS_D_IN / 2)) {
-    cometStart[2] = 1;
-  }
-  if (cometStart[2]) {
-    comet(leds_D_IN, NUM_LEDS_D_IN, Orange, Black, cometSpeed, cometLength, 9);
-  }
+  comet(leds_L, NUM_LEDS_L, Blue, Black, cometSpeed, cometLength, 5, NUM_LEDS_L);
 
+  // ******************************************************** STRIP 5 ********************************************************
+  comet(leds_D1, NUM_LEDS_D1, Red, Black, cometSpeed, cometLength, 6, NUM_LEDS_D1);
+  comet(leds_D1, NUM_LEDS_D1, Orange, Black, cometSpeed, cometLength, 7, NUM_LEDS_D1);
+
+  // ******************************************************** STRIP 6 ********************************************************
+  comet(leds_D2, NUM_LEDS_D2, Red, Black, cometSpeed, cometLength, 8, NUM_LEDS_D2);
+  comet(leds_D2, NUM_LEDS_D2, Orange, Black, cometSpeed, cometLength, 9, NUM_LEDS_D2);
+
+  for (int ii = 0; ii < NUM_LED_COMETS; ii++) {
+    cometPositions[ii]++;  
+  }
 
   // ***************************************************************************************************************************************** PULSE
   /*
@@ -157,8 +151,8 @@ void loop() {
   pulse(leds_W, NUM_LEDS_W, toggleColor ? Purple : Pink, Black, pulseSpeed, pulseCounter);
   pulse(leds_I, NUM_LEDS_I, Yellow, Black, pulseSpeed, pulseCounter);
   pulse(leds_L, NUM_LEDS_L, Blue, Black, pulseSpeed, pulseCounter);
-  pulse(leds_D_OUT, NUM_LEDS_D_OUT, toggleColor ? Red : Orange, Black, pulseSpeed, pulseCounter);
-  pulse(leds_D_IN, NUM_LEDS_D_IN, toggleColor ? Red : Orange, Black, pulseSpeed, pulseCounter);
+  pulse(leds_D1, NUM_LEDS_D1, toggleColor ? Red : Orange, Black, pulseSpeed, pulseCounter);
+  pulse(leds_D2, NUM_LEDS_D2, toggleColor ? Red : Orange, Black, pulseSpeed, pulseCounter);
   */
 
   // ***************************************************************************************************************************************** TWINKLE
@@ -167,15 +161,16 @@ void loop() {
   twinkle(leds_W, NUM_LEDS_W, Purple);
   twinkle(leds_I, NUM_LEDS_I, Yellow);
   twinkle(leds_L, NUM_LEDS_L, Blue);
-  twinkle(leds_D_OUT, NUM_LEDS_D_OUT, Red);
-  twinkle(leds_D_IN, NUM_LEDS_D_IN, Red);
+  twinkle(leds_D1, NUM_LEDS_D1, Red);
+  twinkle(leds_D2, NUM_LEDS_D2, Red);
   */
 
+  //delay(10);
   FastLED.show();
 }
 
 // Takes an LED array, number of LEDs in said array, start color, end color, speed, and comet length, and comet identifier number
-void comet(CRGB* ledStrip, uint8_t numLeds, CHSV startColor, CHSV endColor, int speed, int tailLength, int cometNum) {
+void comet(CRGB* ledStrip, uint8_t numLeds, CHSV startColor, CHSV endColor, int speed, int tailLength, int cometNum, int totalLed) {
   int& cometPosition = cometPositions[cometNum];
 
   // Fade out the tail of the comet
@@ -184,12 +179,14 @@ void comet(CRGB* ledStrip, uint8_t numLeds, CHSV startColor, CHSV endColor, int 
     ledStrip[tailPos].fadeToBlackBy(10);           // Adjust the fade amount for the comet tail
   }
 
-  // Set the head of the comet to the chosen color without blending
-  ledStrip[cometPosition] = startColor;
+  if (cometPosition < totalLed) {
+    // Set the head of the comet to the chosen color without blending
+    ledStrip[cometPosition] = startColor;
+  }
 
   // Move the comet
-  cometPosition++;
-  if (cometPosition >= numLeds) {
+  //cometPosition++;
+  if (cometPosition >= totalLed) {
     cometPosition = 0;  // Reset the comet's position
   }
 
@@ -197,6 +194,9 @@ void comet(CRGB* ledStrip, uint8_t numLeds, CHSV startColor, CHSV endColor, int 
   for (int ii = 0; ii < numLeds; ii++) {
     ledStrip[ii] = blend(ledStrip[ii], endColor, 10);  // Blend with the background color
   }
+
+  // Comment line below if using endColor other than black
+  fadeToBlackBy(ledStrip, numLeds, 10);
 
   //FastLED.show();
   delay(speed);  // Adjust the delay for the desired comet speed
