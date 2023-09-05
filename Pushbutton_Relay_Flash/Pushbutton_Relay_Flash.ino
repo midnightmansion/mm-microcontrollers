@@ -13,8 +13,8 @@ Author: Kevin Xu
 Date: August 23, 2023
 */
 
-const int buttonPin = 2;  // Pin number for the pushbutton
-const int relayPin = 13;  // Pin number for the relay
+const int buttonPin = 8;  // Pin number for the pushbutton
+const int relayPin = 9;  // Pin number for the relay
 
 int buttonState = LOW;               // Current state of the button
 int lastButtonState = LOW;           // Previous state of the button
