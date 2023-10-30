@@ -31,7 +31,7 @@ void loop() {
   // outputs states
   for (int ii = 0; ii < numSensors - 1; ii++) {
     Serial.print(state[ii]);
-    Serial.print("   ");
+    Serial.print(" ");
   }
 
   Serial.println();

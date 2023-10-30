@@ -32,15 +32,15 @@ Date: September 11, 2023
 #include <FastLED.h>
 
 #define LED_PIN_W1 2     // Pin for Part 1  of 'W'
-#define LED_PIN_W2 3     // Pin for Part 2 of 'W'
+#define LED_PIN_W2 8     // Pin for Part 2 of 'W'
 #define LED_PIN_I 4      // Pin for 'I'
 #define LED_PIN_L 5      // Pin for 'L'
 #define LED_PIN_D_OUT 6  // Pin for Outer 'D'
 #define LED_PIN_D_IN 7   // Pin for Inner 'D'
 
 #define NUM_LEDS_W1 100       // Number of LEDs for 'W1'
-#define NUM_LEDS_W2 63        // Number of LEDs for 'W1'
-#define NUM_LEDS_W_TOTAL 163  // Number of LEDs for 'W' Total
+#define NUM_LEDS_W2 53        // Number of LEDs for 'W1'
+#define NUM_LEDS_W_TOTAL 153  // Number of LEDs for 'W' Total
 #define NUM_LEDS_I 52         // Number of LEDs for 'I'
 #define NUM_LEDS_L 70         // Number of LEDs for 'L'
 #define NUM_LEDS_D1 71        // Number of LEDs for Outer 'D'
@@ -77,6 +77,7 @@ const uint8_t cometLength = 20;                  // Adjust the length of comet
 int cometPositions[NUM_LED_COMETS] = {};         // One position for each strip
 bool cometStart[NUM_STRIPS_SHARED_COMETS] = {};  // Signal for when multi-comets on one strip to start
 
+/*
 bool WBothActive[] = { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
                        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -94,11 +95,12 @@ bool WBothActive[] = { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
                        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                        1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                        1, 1};
+*/                       
 
-const int buttonPin = 8;   // Pin number for the pushbutton
-const int relayPin1 = 9;   // Pin number for the relay
-const int relayPin2 = 10;  // Pin number for the relay
-const int relayPin3 = 11;  // Pin number for the relay
+const int buttonPin = 9;   // Pin number for the pushbutton
+const int relayPin1 = 10;   // Pin number for the relay
+const int relayPin2 = 11;  // Pin number for the relay
+const int relayPin3 = 12;  // Pin number for the relay
 
 int buttonState = LOW;               // Current state of the button
 int lastButtonState = LOW;           // Previous state of the button
@@ -197,7 +199,7 @@ void loop() {
 
   // W is a special case with two strips together with some LEDs that will never be active
   for (int ii = 0; ii < 8; ii++) {
-    moveActiveLED(WBothActive, cometPositions[ii], NUM_LEDS_W_TOTAL);
+    //moveActiveLED(WBothActive, cometPositions[ii], NUM_LEDS_W_TOTAL);
   }
 
   // Inner D comets
